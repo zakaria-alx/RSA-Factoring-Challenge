@@ -1,42 +1,48 @@
-#!/bin/bash
-
-# Function to check if a number is prime
-is_prime() {
-    if [ $1 -lt 2 ]; then
-        return 1
-    fi
-
-    for ((i = 2; i * i <= $1; i++)); do
-        if [ $((n % i)) -eq 0 ]; then
-            return 1
+#!/usr/bin/env bash
+#is a challenge
+check_factor()
+{
+	if [ $# -ne 3 ];
+        then
+                args=("$@")
+                count=0
+                num2=1
+                for a in ${args[*]};
+                do
+                        if [ $count -gt 1 ];
+                        then
+                                num2=$(echo $a*$num2 | bc)
+                        fi
+                        count=$((count + 1))
+                done
+        else
+                num2=$3
         fi
-    done
 
-    return 0
+        num1=$2
+        num=$(echo "$1" | tr ':' '=')
+
+        result=$(echo "if($num2 > $num1) 1 else 0" | bc)
+	        if ((result == 1)); then
+		        numcp=$num1
+		        num1=$num2
+		        num2=$numcp
+                fi
+
+        echo "$num$num1*$num2"
 }
 
-# Check if an input file is provided
-if [ -z "$1" ]; then
-    echo "Usage: ./rsa <input_file>"
-    exit 1
-fi
-
-# Read the input file
-filename="$1"
-n=$(cat "$filename")
-
-# Find the prime factors of n
-for ((i = 2; i * i <= $n; i++)); do
-    if [ $((n % i)) -eq 0 ]; then
-        factor1=$i
-        factor2=$((n / i))
-        break
-    fi
-done
-
-# Check if both factors are prime
-if is_prime $factor1 && is_prime $factor2; then
-    echo "$n=$factor1*$factor2"
+if [ $# -ne 1 ]
+then
+        echo 'Usage: rsa <file>'
+        exit 1
 else
-    echo "Unable to find prime factors for n: $n"
+
+        while read i
+        do
+
+                result=$(factor "$i")
+                check_factor $result
+
+        done < "$1"
 fi

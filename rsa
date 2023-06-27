@@ -1,35 +1,42 @@
-#!/usr/bin/python3
+#!/bin/bash
 
+# Function to check if a number is prime
+is_prime() {
+    if [ $1 -lt 2 ]; then
+        return 1
+    fi
 
-from fractions import gcd
-from sys import argv
+    for ((i = 2; i * i <= $1; i++)); do
+        if [ $((n % i)) -eq 0 ]; then
+            return 1
+        fi
+    done
 
+    return 0
+}
 
-def pollards_rho(n):
-    x = 2
-    y = 2
-    d = 1
-    f = lambda x: (x**2 + 1) % n
-    while d == 1:
-        x = f(x)
-        y = f(f(y))
-        d = gcd(abs(x - y), n)
-    if d != n:
-        return d
+# Check if an input file is provided
+if [ -z "$1" ]; then
+    echo "Usage: ./rsa <input_file>"
+    exit 1
+fi
 
+# Read the input file
+filename="$1"
+n=$(cat "$filename")
 
-def read_file():
-    with open(argv[1]) as f:
-        for number in f:
-            num = int(number)
-            if num % 2 == 0:
-                print("{:d}={}*{}".format(num, num // 2, 2))
-            else:
-                p = pollards_rho(num)
-                f1 = p
-                f2 = int(num / p)
-                print("{}={}*{}".format(num, f1, f2))
+# Find the prime factors of n
+for ((i = 2; i * i <= $n; i++)); do
+    if [ $((n % i)) -eq 0 ]; then
+        factor1=$i
+        factor2=$((n / i))
+        break
+    fi
+done
 
-
-if __name__ == "__main__":
-    read_file()
+# Check if both factors are prime
+if is_prime $factor1 && is_prime $factor2; then
+    echo "$n=$factor1*$factor2"
+else
+    echo "Unable to find prime factors for n: $n"
+fi

@@ -1,26 +1,21 @@
-#!/usr/bin/python3
+#!/bin/bash
 
-from sys import argv
-from math import sqrt
+if [ $# -ne 1 ]; then
+    echo "Usage: $0 <file>"
+    exit 1
+fi
 
+filename=$1
 
-def factor():
-    with open(argv[1]) as f:
-        for line in f:
-            num = int(line)
-            print("{:d}=".format(num), end="")
-            if num % 2 == 0:
-                print("{}*2".format(num//2))
-                continue
-            sqn = int(sqrt(num))
-            if sqn % 2 == 0:
-                sqn += 1
-            for i in range(3, sqn + 1, 2):
-                if num % i == 0:
-                    print("{}*{}".format(i, num//i))
-                    break
-            if num % i != 0:
-                print("{}={}*1".format(num, num))
+while IFS= read -r number; do
+    divisor=2
 
-
-factor()
+    while (( divisor < number )); do
+        if (( number % divisor == 0 )); then
+            quotient=$(( number / divisor ))
+            echo "${number}=${quotient}*${divisor}"
+            break
+        fi
+        divisor=$(( divisor + 1 ))
+    done
+done < "$filename"

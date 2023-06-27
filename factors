@@ -1,21 +1,10 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# Read number from file and print his factors in file
 
-if [ $# -ne 1 ]; then
-    echo "Usage: $0 <file>"
-    exit 1
-fi
+FILE=$1
 
-filename=$1
-
-while IFS= read -r number; do
-    divisor=2
-
-    while (( divisor < number )); do
-        if (( number % divisor == 0 )); then
-            quotient=$(( number / divisor ))
-            echo "${number}=${quotient}*${divisor}"
-            break
-        fi
-        divisor=$(( divisor + 1 ))
-    done
-done < "$filename"
+while read NUM
+do
+    factors=($(factor $NUM))
+    echo "$NUM=$(($NUM/${factors[1]}))*${factors[1]}"
+done < $FILE
